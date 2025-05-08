@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Edit, Trash2, Share, Plus, Calendar, Users, DollarSign } from "lucide-react";
 import { connectWallet, donate, withdrawDonation } from "@/lib/metamask";
 
