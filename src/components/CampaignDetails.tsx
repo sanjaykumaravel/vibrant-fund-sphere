@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -337,84 +336,84 @@ const CampaignDetails = () => {
                 </>
               ) : (
                 <>
-                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="w-full bg-gradient-to-r from-pink-500 via-violet-600 to-indigo-600 hover:from-pink-600 hover:via-violet-700 hover:to-indigo-700 text-white border-0 flex items-center gap-2 shadow-md hover:shadow-lg transition-all">
-                        <Plus className="h-4 w-4" />
-                        Support This Project
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="bg-gradient-to-br from-white to-violet-50 border-violet-100">
-                      <DialogHeader>
-                        <DialogTitle className="text-center text-xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-600">Support this campaign</DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="contribution">Contribution Amount (ETH)</Label>
-                          <Input
-                            id="contribution"
-                            type="number"
-                            min="0.01"
-                            step="0.01"
-                            value={contribution}
-                            onChange={(e) => setContribution(e.target.value)}
-                            placeholder="0.1"
-                            className="border-violet-200 focus-visible:ring-violet-400"
-                          />
-                          <p className="text-xs text-muted-foreground">
-                            Minimum contribution: 0.01 ETH
-                          </p>
-                        </div>
-                        
-                        <Button 
-                          className="w-full bg-gradient-to-r from-pink-500 via-violet-600 to-indigo-600 hover:from-pink-600 hover:via-violet-700 hover:to-indigo-700 text-white border-0 shadow-md"
-                          onClick={handleContribute}
-                        >
-                          {wallet ? "Contribute Now" : "Connect Wallet & Contribute"}
+                  <div className="flex gap-2 w-full">
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="flex-1 bg-gradient-to-r from-pink-500 via-violet-600 to-indigo-600 hover:from-pink-600 hover:via-violet-700 hover:to-indigo-700 text-white border-0 flex items-center gap-2 shadow-md hover:shadow-lg transition-all">
+                          <Plus className="h-4 w-4" />
+                          Support This Project
                         </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                      </DialogTrigger>
+                      <DialogContent className="bg-gradient-to-br from-white to-violet-50 border-violet-100">
+                        <DialogHeader>
+                          <DialogTitle className="text-center text-xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-600">Support this campaign</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="contribution">Contribution Amount (ETH)</Label>
+                            <Input
+                              id="contribution"
+                              type="number"
+                              min="0.01"
+                              step="0.01"
+                              value={contribution}
+                              onChange={(e) => setContribution(e.target.value)}
+                              placeholder="0.1"
+                              className="border-violet-200 focus-visible:ring-violet-400"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                              Minimum contribution: 0.01 ETH
+                            </p>
+                          </div>
+                          
+                          <Button 
+                            className="w-full bg-gradient-to-r from-pink-500 via-violet-600 to-indigo-600 hover:from-pink-600 hover:via-violet-700 hover:to-indigo-700 text-white border-0 shadow-md"
+                            onClick={handleContribute}
+                          >
+                            {wallet ? "Contribute Now" : "Connect Wallet & Contribute"}
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    
+                    <Dialog open={isRefundDialogOpen} onOpenChange={setIsRefundDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          className="flex-1 border-pink-300 text-pink-700 hover:bg-pink-50 flex items-center gap-2 shadow-sm"
+                        >
+                          <RefreshCcw className="h-4 w-4" />
+                          Refund
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="bg-gradient-to-br from-white to-pink-50 border-pink-100">
+                        <DialogHeader>
+                          <DialogTitle className="text-center text-xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-600">Request a Refund</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                          <p className="text-center text-muted-foreground">
+                            You can request a refund if the campaign hasn't reached its funding goal by the deadline. Once confirmed, your contribution will be returned to your wallet.
+                          </p>
+                          <Button 
+                            className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-0 shadow-md"
+                            onClick={handleRefund}
+                          >
+                            Confirm Refund Request
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                   
                   {hasContributed && (
-                    <>
-                      <Button 
-                        variant="outline" 
-                        className="w-full border-violet-300 text-violet-700 hover:bg-violet-50 flex items-center gap-2 shadow-sm"
-                        onClick={handleWithdraw}
-                      >
-                        <Wallet className="h-4 w-4" />
-                        Withdraw Contribution
-                      </Button>
-                      
-                      <Dialog open={isRefundDialogOpen} onOpenChange={setIsRefundDialogOpen}>
-                        <DialogTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            className="w-full border-pink-300 text-pink-700 hover:bg-pink-50 flex items-center gap-2 shadow-sm"
-                          >
-                            <RefreshCcw className="h-4 w-4" />
-                            Request Refund
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="bg-gradient-to-br from-white to-pink-50 border-pink-100">
-                          <DialogHeader>
-                            <DialogTitle className="text-center text-xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-600">Request a Refund</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4 py-4">
-                            <p className="text-center text-muted-foreground">
-                              You can request a refund if the campaign hasn't reached its funding goal by the deadline. Once confirmed, your contribution will be returned to your wallet.
-                            </p>
-                            <Button 
-                              className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-0 shadow-md"
-                              onClick={handleRefund}
-                            >
-                              Confirm Refund Request
-                            </Button>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    </>
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-violet-300 text-violet-700 hover:bg-violet-50 flex items-center gap-2 shadow-sm"
+                      onClick={handleWithdraw}
+                    >
+                      <Wallet className="h-4 w-4" />
+                      Withdraw Contribution
+                    </Button>
                   )}
                 </>
               )}

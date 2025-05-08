@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -65,30 +66,50 @@ const CampaignForm = () => {
     // In a real app, this would send the data to a backend API or smart contract
     console.log("Submitting campaign:", formData);
     
+    // Add the campaign to localStorage to display in explore page
+    const campaigns = JSON.parse(localStorage.getItem('campaigns') || '[]');
+    const newCampaign = {
+      id: Date.now().toString(),
+      title: formData.title,
+      description: formData.description,
+      image: formData.image,
+      goal: parseFloat(formData.goal),
+      raised: 0, // New campaign starts with 0 raised
+      daysLeft: parseInt(formData.duration),
+      backers: 0, // New campaign starts with 0 backers
+      category: formData.category,
+      story: formData.story,
+      creator: "0xf23...45ab", // Mock creator address
+      contributions: []
+    };
+    
+    campaigns.push(newCampaign);
+    localStorage.setItem('campaigns', JSON.stringify(campaigns));
+    
     toast({
       title: "Campaign Created!",
       description: "Your campaign has been successfully published",
     });
     
-    // Navigate to the campaign page (would use the actual ID in a real app)
+    // Navigate to the explore page to see the new campaign
     setTimeout(() => {
-      navigate("/");
+      navigate("/explore");
     }, 1500);
   };
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4">
-      <Card className="border-2 border-primary/20">
+      <Card className="border-2 border-primary/20 bg-gradient-to-br from-white to-indigo-50 shadow-xl">
         <CardContent className="pt-6">
           <Tabs value={step} className="mb-8">
-            <TabsList className="grid grid-cols-3 w-full">
-              <TabsTrigger value="details" disabled={step !== "details"}>
+            <TabsList className="grid grid-cols-3 w-full bg-gradient-to-r from-indigo-100 to-purple-100">
+              <TabsTrigger value="details" disabled={step !== "details"} className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-violet-500 data-[state=active]:text-white">
                 Campaign Details
               </TabsTrigger>
-              <TabsTrigger value="story" disabled={step !== "story"}>
+              <TabsTrigger value="story" disabled={step !== "story"} className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-violet-500 data-[state=active]:text-white">
                 Your Story
               </TabsTrigger>
-              <TabsTrigger value="review" disabled={step !== "review"}>
+              <TabsTrigger value="review" disabled={step !== "review"} className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-violet-500 data-[state=active]:text-white">
                 Review & Submit
               </TabsTrigger>
             </TabsList>
@@ -104,6 +125,7 @@ const CampaignForm = () => {
                     onChange={handleChange}
                     placeholder="Enter a clear, specific title"
                     required
+                    className="border-violet-200 focus-visible:ring-violet-400"
                   />
                 </div>
 
@@ -120,6 +142,7 @@ const CampaignForm = () => {
                       onChange={handleChange}
                       placeholder="1.5"
                       required
+                      className="border-violet-200 focus-visible:ring-violet-400"
                     />
                   </div>
                   
@@ -135,6 +158,7 @@ const CampaignForm = () => {
                       onChange={handleChange}
                       placeholder="30"
                       required
+                      className="border-violet-200 focus-visible:ring-violet-400"
                     />
                   </div>
                 </div>
@@ -146,7 +170,7 @@ const CampaignForm = () => {
                     name="category"
                     value={formData.category}
                     onChange={handleChange}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-10 w-full rounded-md border border-violet-200 bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     required
                   >
                     <option value="">Select a category</option>
@@ -170,6 +194,7 @@ const CampaignForm = () => {
                     onChange={handleChange}
                     placeholder="https://example.com/image.jpg"
                     required
+                    className="border-violet-200 focus-visible:ring-violet-400"
                   />
                 </div>
 
@@ -181,14 +206,14 @@ const CampaignForm = () => {
                     value={formData.description}
                     onChange={handleChange}
                     placeholder="Briefly describe your campaign (100-150 words)"
-                    className="resize-none"
+                    className="resize-none border-violet-200 focus-visible:ring-violet-400"
                     rows={3}
                     required
                   />
                 </div>
 
                 <div className="flex justify-end">
-                  <Button onClick={handleNext} className="bg-primary hover:bg-primary/90">
+                  <Button onClick={handleNext} className="bg-gradient-to-r from-pink-500 to-violet-600 hover:from-pink-600 hover:to-violet-700 text-white border-0 shadow-md">
                     Next: Add Your Story
                   </Button>
                 </div>
@@ -205,16 +230,16 @@ const CampaignForm = () => {
                     value={formData.story}
                     onChange={handleChange}
                     placeholder="Tell potential backers about your project. What are you trying to accomplish? Why does it matter? What's your plan to make it happen?"
-                    className="min-h-[300px]"
+                    className="min-h-[300px] border-violet-200 focus-visible:ring-violet-400"
                     required
                   />
                 </div>
 
                 <div className="flex justify-between">
-                  <Button variant="outline" onClick={handlePrevious}>
+                  <Button variant="outline" onClick={handlePrevious} className="border-violet-200 text-violet-700 hover:border-violet-300 hover:bg-violet-50">
                     Previous: Campaign Details
                   </Button>
-                  <Button onClick={handleNext} className="bg-primary hover:bg-primary/90">
+                  <Button onClick={handleNext} className="bg-gradient-to-r from-pink-500 to-violet-600 hover:from-pink-600 hover:to-violet-700 text-white border-0 shadow-md">
                     Next: Review & Submit
                   </Button>
                 </div>
@@ -224,36 +249,36 @@ const CampaignForm = () => {
             <TabsContent value="review" className="py-4">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">Review Your Campaign</h3>
+                  <h3 className="text-lg font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-600">Review Your Campaign</h3>
                   
-                  <div className="space-y-4 border rounded-lg p-4">
+                  <div className="space-y-4 border rounded-lg p-4 bg-white/70">
                     <div>
-                      <span className="font-medium">Title:</span> {formData.title}
+                      <span className="font-medium text-violet-700">Title:</span> {formData.title}
                     </div>
                     <div>
-                      <span className="font-medium">Goal:</span> {formData.goal} ETH
+                      <span className="font-medium text-violet-700">Goal:</span> {formData.goal} ETH
                     </div>
                     <div>
-                      <span className="font-medium">Duration:</span> {formData.duration} days
+                      <span className="font-medium text-violet-700">Duration:</span> {formData.duration} days
                     </div>
                     <div>
-                      <span className="font-medium">Category:</span> {formData.category}
+                      <span className="font-medium text-violet-700">Category:</span> {formData.category}
                     </div>
                     <div>
-                      <span className="font-medium">Description:</span> {formData.description}
+                      <span className="font-medium text-violet-700">Description:</span> {formData.description}
                     </div>
                     <div className="pt-2 border-t">
-                      <span className="font-medium">Story Preview:</span>
+                      <span className="font-medium text-violet-700">Story Preview:</span>
                       <p className="mt-1 text-sm">{formData.story.substring(0, 200)}...</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex justify-between">
-                  <Button variant="outline" onClick={handlePrevious}>
+                  <Button variant="outline" onClick={handlePrevious} className="border-violet-200 text-violet-700 hover:border-violet-300 hover:bg-violet-50">
                     Previous: Your Story
                   </Button>
-                  <Button onClick={handleSubmit} className="bg-primary hover:bg-primary/90">
+                  <Button onClick={handleSubmit} className="bg-gradient-to-r from-pink-500 to-violet-600 hover:from-pink-600 hover:to-violet-700 text-white border-0 shadow-md">
                     Publish Campaign
                   </Button>
                 </div>

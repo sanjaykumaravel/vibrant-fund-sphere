@@ -1,6 +1,6 @@
 
 import Header from "@/components/Header";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CampaignCard from "@/components/CampaignCard";
@@ -113,9 +113,18 @@ const MOCK_CAMPAIGNS = [
 const Explore = () => {
   const [category, setCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [allCampaigns, setAllCampaigns] = useState([...MOCK_CAMPAIGNS]);
+  
+  // Load user-created campaigns from localStorage
+  useEffect(() => {
+    const userCampaigns = JSON.parse(localStorage.getItem('campaigns') || '[]');
+    if (userCampaigns.length > 0) {
+      setAllCampaigns([...userCampaigns, ...MOCK_CAMPAIGNS]);
+    }
+  }, []);
   
   // Filter campaigns by category and search term
-  const filteredCampaigns = MOCK_CAMPAIGNS.filter(campaign => {
+  const filteredCampaigns = allCampaigns.filter(campaign => {
     const matchesCategory = category === "all" || campaign.category.toLowerCase() === category.toLowerCase();
     const matchesSearch = campaign.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          campaign.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -123,13 +132,13 @@ const Explore = () => {
   });
   
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 to-blue-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
       <Header />
       
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-indigo-800">
+            <h1 className="text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600">
               Explore Campaigns
             </h1>
             <p className="text-lg text-gray-700 max-w-2xl mx-auto">
@@ -143,20 +152,20 @@ const Explore = () => {
               <Input
                 type="text"
                 placeholder="Search campaigns..."
-                className="pl-10"
+                className="pl-10 border-violet-200 focus-visible:ring-violet-400"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             
             <Tabs defaultValue="all" className="mt-6 md:mt-0" onValueChange={setCategory}>
-              <TabsList className="bg-white/50 backdrop-blur-sm">
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="technology">Tech</TabsTrigger>
-                <TabsTrigger value="arts">Arts</TabsTrigger>
-                <TabsTrigger value="environment">Environment</TabsTrigger>
-                <TabsTrigger value="fashion">Fashion</TabsTrigger>
-                <TabsTrigger value="health">Health</TabsTrigger>
+              <TabsList className="bg-gradient-to-r from-indigo-100 to-violet-100 backdrop-blur-sm">
+                <TabsTrigger value="all" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-violet-500 data-[state=active]:text-white">All</TabsTrigger>
+                <TabsTrigger value="technology" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-violet-500 data-[state=active]:text-white">Tech</TabsTrigger>
+                <TabsTrigger value="arts" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-violet-500 data-[state=active]:text-white">Arts</TabsTrigger>
+                <TabsTrigger value="environment" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-violet-500 data-[state=active]:text-white">Environment</TabsTrigger>
+                <TabsTrigger value="fashion" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-violet-500 data-[state=active]:text-white">Fashion</TabsTrigger>
+                <TabsTrigger value="health" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-violet-500 data-[state=active]:text-white">Health</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -168,49 +177,53 @@ const Explore = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16">
-              <h3 className="text-xl font-medium mb-2">No campaigns found</h3>
+            <div className="text-center py-16 bg-white/50 rounded-xl shadow-sm">
+              <h3 className="text-xl font-medium mb-2 text-violet-700">No campaigns found</h3>
               <p className="text-muted-foreground">Try adjusting your search or filters</p>
+              <Button className="mt-4 bg-gradient-to-r from-pink-500 to-violet-600 border-0" onClick={() => {
+                setSearchTerm("");
+                setCategory("all");
+              }}>Clear Filters</Button>
             </div>
           )}
         </div>
       </main>
       
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gradient-to-r from-violet-800 via-purple-800 to-indigo-800 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-indigo-300">FundFlow</h3>
-              <p className="text-gray-400">
+              <h3 className="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300">FundFlow</h3>
+              <p className="text-gray-300">
                 Decentralized crowdfunding platform powered by blockchain technology
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Button variant="link" className="p-0 h-auto text-gray-400 hover:text-white">Home</Button></li>
-                <li><Button variant="link" className="p-0 h-auto text-gray-400 hover:text-white">Explore</Button></li>
-                <li><Button variant="link" className="p-0 h-auto text-gray-400 hover:text-white">Create Campaign</Button></li>
+              <h4 className="font-semibold mb-4 text-pink-200">Quick Links</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li><Button variant="link" className="p-0 h-auto text-gray-300 hover:text-pink-200">Home</Button></li>
+                <li><Button variant="link" className="p-0 h-auto text-gray-300 hover:text-pink-200">Explore</Button></li>
+                <li><Button variant="link" className="p-0 h-auto text-gray-300 hover:text-pink-200">Create Campaign</Button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Resources</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Button variant="link" className="p-0 h-auto text-gray-400 hover:text-white">How It Works</Button></li>
-                <li><Button variant="link" className="p-0 h-auto text-gray-400 hover:text-white">FAQ</Button></li>
-                <li><Button variant="link" className="p-0 h-auto text-gray-400 hover:text-white">Support</Button></li>
+              <h4 className="font-semibold mb-4 text-purple-200">Resources</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li><Button variant="link" className="p-0 h-auto text-gray-300 hover:text-purple-200">How It Works</Button></li>
+                <li><Button variant="link" className="p-0 h-auto text-gray-300 hover:text-purple-200">FAQ</Button></li>
+                <li><Button variant="link" className="p-0 h-auto text-gray-300 hover:text-purple-200">Support</Button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Connect</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Button variant="link" className="p-0 h-auto text-gray-400 hover:text-white">Twitter</Button></li>
-                <li><Button variant="link" className="p-0 h-auto text-gray-400 hover:text-white">Discord</Button></li>
-                <li><Button variant="link" className="p-0 h-auto text-gray-400 hover:text-white">Telegram</Button></li>
+              <h4 className="font-semibold mb-4 text-indigo-200">Connect</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li><Button variant="link" className="p-0 h-auto text-gray-300 hover:text-indigo-200">Twitter</Button></li>
+                <li><Button variant="link" className="p-0 h-auto text-gray-300 hover:text-indigo-200">Discord</Button></li>
+                <li><Button variant="link" className="p-0 h-auto text-gray-300 hover:text-indigo-200">Telegram</Button></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
             <p>&copy; {new Date().getFullYear()} FundFlow. All rights reserved.</p>
           </div>
         </div>
