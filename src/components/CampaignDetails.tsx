@@ -189,38 +189,38 @@ const CampaignDetails = () => {
               className="w-full h-full object-cover"
             />
             <div className="absolute top-4 right-4 flex gap-2">
-              <Badge className="bg-primary/90 hover:bg-primary">{campaign.category}</Badge>
+              <Badge className="bg-gradient-to-r from-violet-500 to-indigo-600 hover:from-violet-600 hover:to-indigo-700 border-0">{campaign.category}</Badge>
             </div>
           </div>
           
           <div>
-            <h1 className="text-3xl font-bold mb-2">{campaign.title}</h1>
+            <h1 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-violet-700 to-indigo-800">{campaign.title}</h1>
             <p className="text-muted-foreground mb-4">{campaign.description}</p>
           </div>
           
-          <Tabs defaultValue="story">
-            <TabsList className="mb-4">
+          <Tabs defaultValue="story" className="bg-white rounded-lg shadow-sm">
+            <TabsList className="mb-4 bg-gray-100">
               <TabsTrigger value="story">Story</TabsTrigger>
               <TabsTrigger value="updates">Updates</TabsTrigger>
-              <TabsTrigger value="backers">Backers</TabsTrigger>
+              <TabsTrigger value="donaters">Donaters</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="story" className="prose prose-slate max-w-none">
+            <TabsContent value="story" className="prose prose-slate max-w-none px-6 py-4">
               <div className="whitespace-pre-line">
                 {campaign.story}
               </div>
             </TabsContent>
             
-            <TabsContent value="updates">
+            <TabsContent value="updates" className="px-6 py-4">
               <div className="p-8 text-center">
                 <p className="text-muted-foreground">No updates yet</p>
               </div>
             </TabsContent>
             
-            <TabsContent value="backers">
+            <TabsContent value="donaters" className="px-6 py-4">
               <div className="space-y-4">
                 {campaign.contributions.map((contribution, index) => (
-                  <Card key={index}>
+                  <Card key={index} className="overflow-hidden border-l-4 border-l-violet-500">
                     <CardContent className="p-4 flex justify-between items-center">
                       <div>
                         <p className="font-medium">
@@ -232,7 +232,7 @@ const CampaignDetails = () => {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-primary">{contribution.amount} ETH</p>
+                        <p className="font-bold text-violet-600">{contribution.amount} ETH</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -244,14 +244,14 @@ const CampaignDetails = () => {
         
         {/* Right column: Campaign status and actions */}
         <div className="space-y-6">
-          <Card className="border-2 border-primary/20">
+          <Card className="border-2 border-violet-300 overflow-hidden bg-gradient-to-br from-white to-violet-50">
             <CardContent className="pt-6 space-y-6">
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="font-medium">{campaign.raised} ETH raised</span>
                   <span className="text-muted-foreground">{percentRaised}%</span>
                 </div>
-                <Progress value={percentRaised} className="h-2" />
+                <Progress value={percentRaised} className="h-2 bg-violet-100" indicatorClassName="bg-gradient-to-r from-violet-500 to-indigo-600" />
                 <div className="flex justify-end text-xs text-muted-foreground mt-1">
                   Goal: {campaign.goal} ETH
                 </div>
@@ -260,7 +260,7 @@ const CampaignDetails = () => {
               <div className="grid grid-cols-3 gap-4 pt-2">
                 <div className="text-center">
                   <div className="flex justify-center mb-1">
-                    <Calendar className="h-5 w-5 text-primary" />
+                    <Calendar className="h-5 w-5 text-violet-600" />
                   </div>
                   <p className="font-bold">{campaign.daysLeft}</p>
                   <p className="text-xs text-muted-foreground">Days Left</p>
@@ -268,7 +268,7 @@ const CampaignDetails = () => {
                 
                 <div className="text-center">
                   <div className="flex justify-center mb-1">
-                    <DollarSign className="h-5 w-5 text-primary" />
+                    <DollarSign className="h-5 w-5 text-violet-600" />
                   </div>
                   <p className="font-bold">{campaign.raised}</p>
                   <p className="text-xs text-muted-foreground">ETH Raised</p>
@@ -276,10 +276,10 @@ const CampaignDetails = () => {
                 
                 <div className="text-center">
                   <div className="flex justify-center mb-1">
-                    <Users className="h-5 w-5 text-primary" />
+                    <Users className="h-5 w-5 text-violet-600" />
                   </div>
                   <p className="font-bold">{campaign.backers}</p>
-                  <p className="text-xs text-muted-foreground">Backers</p>
+                  <p className="text-xs text-muted-foreground">Donaters</p>
                 </div>
               </div>
             </CardContent>
@@ -287,7 +287,7 @@ const CampaignDetails = () => {
             <CardFooter className="flex flex-col gap-3 pt-2 pb-6">
               {isCreator ? (
                 <>
-                  <Button className="w-full bg-primary hover:bg-primary/90 flex items-center gap-2" asChild>
+                  <Button className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white border-0 flex items-center gap-2" asChild>
                     <Link to={`/campaign/edit/${campaign.id}`}>
                       <Edit className="h-4 w-4" />
                       Edit Campaign
@@ -306,9 +306,9 @@ const CampaignDetails = () => {
                 <>
                   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button className="w-full bg-primary hover:bg-primary/90 flex items-center gap-2">
+                      <Button className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white border-0 flex items-center gap-2 shadow-md hover:shadow-lg transition-all">
                         <Plus className="h-4 w-4" />
-                        Back This Project
+                        Support This Project
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
@@ -333,7 +333,7 @@ const CampaignDetails = () => {
                         </div>
                         
                         <Button 
-                          className="w-full bg-primary hover:bg-primary/90"
+                          className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white border-0"
                           onClick={handleContribute}
                         >
                           {wallet ? "Contribute Now" : "Connect Wallet & Contribute"}
@@ -345,7 +345,7 @@ const CampaignDetails = () => {
                   {hasContributed && (
                     <Button 
                       variant="outline" 
-                      className="w-full border-primary text-primary hover:bg-primary/10 flex items-center gap-2"
+                      className="w-full border-violet-500 text-violet-700 hover:bg-violet-50 flex items-center gap-2"
                       onClick={handleWithdraw}
                     >
                       <ArrowLeft className="h-4 w-4" />
@@ -366,11 +366,11 @@ const CampaignDetails = () => {
             </CardFooter>
           </Card>
           
-          <Card>
+          <Card className="border-violet-200 bg-white">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-                  <span className="font-medium text-primary">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-violet-400 to-indigo-500 flex items-center justify-center text-white">
+                  <span className="font-medium">
                     {campaign.creator.substring(0, 2)}
                   </span>
                 </div>

@@ -51,7 +51,7 @@ const Header = () => {
         
         <div className="flex items-center gap-3">
           <Link to="/create">
-            <Button className="hidden sm:flex gap-2 bg-primary hover:bg-primary/90">
+            <Button className="hidden sm:flex gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 border-0">
               <Rocket className="h-4 w-4" />
               <span>Launch Campaign</span>
             </Button>
@@ -69,7 +69,11 @@ const Header = () => {
               {wallet.substring(0, 6)}...{wallet.substring(wallet.length - 4)}
             </Button>
           ) : (
-            <Button variant="secondary" onClick={handleConnectWallet}>
+            <Button 
+              variant="secondary" 
+              onClick={handleConnectWallet}
+              className="bg-gradient-to-r from-indigo-400 to-violet-500 text-white hover:from-indigo-500 hover:to-violet-600 border-0"
+            >
               Connect Wallet
             </Button>
           )}

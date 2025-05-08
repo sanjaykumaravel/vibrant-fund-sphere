@@ -29,25 +29,46 @@ export const donate = async (amount: number, campaignId: string): Promise<boolea
       method: "eth_requestAccounts",
     });
     
-    const transactionParameters = {
-      to: '0x0000000000000000000000000000000000000000', // This would be the campaign contract address
-      from: accounts[0],
-      value: '0x' + (amount * 1e18).toString(16), // Convert ETH to Wei
-      gas: '0x5208', // 21000 gas
-    };
-
-    const txHash = await window.ethereum.request({
-      method: 'eth_sendTransaction',
-      params: [transactionParameters],
-    });
-
-    // In a real app, we would add the transaction to a database
-    console.log(`Transaction hash: ${txHash}`);
-    console.log(`Donated ${amount} ETH to campaign ${campaignId}`);
+    // Log to help with debugging
+    console.log(`Attempting to donate ${amount} ETH to campaign ${campaignId} from account ${accounts[0]}`);
     
-    return true;
+    // For demo purposes, we're using a fake contract address
+    // In a real app, this would be the actual campaign contract address
+    const campaignAddress = '0x0000000000000000000000000000000000000000';
+    
+    // Convert ETH amount to Wei (as a hex string for MetaMask)
+    const valueInWei = '0x' + (amount * 1e18).toString(16);
+    
+    console.log(`Value in Wei: ${valueInWei}`);
+    
+    const transactionParameters = {
+      to: campaignAddress, // Campaign contract address
+      from: accounts[0], // User's address
+      value: valueInWei, // Amount in Wei (hexadecimal)
+      gas: '0x5208', // 21000 gas limit (standard for ETH transfers)
+    };
+    
+    console.log("Transaction parameters:", transactionParameters);
+    
+    try {
+      const txHash = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [transactionParameters],
+      });
+      
+      console.log(`Transaction successful with hash: ${txHash}`);
+      
+      // In a real app, we would add the transaction to a database
+      console.log(`Successfully donated ${amount} ETH to campaign ${campaignId}`);
+      
+      return true;
+    } catch (txError) {
+      // This catches errors like user rejection
+      console.error("Transaction error:", txError);
+      return false;
+    }
   } catch (error) {
-    console.error("Error donating via MetaMask:", error);
+    console.error("Error in donate function:", error);
     return false;
   }
 };
@@ -59,9 +80,22 @@ export const withdrawDonation = async (campaignId: string): Promise<boolean> => 
   }
   
   try {
-    // This would interact with the smart contract to withdraw funds
-    // For demo purposes, just log the action
-    console.log(`Withdrawn donation from campaign ${campaignId}`);
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    
+    console.log(`Attempting to withdraw donation from campaign ${campaignId} for account ${accounts[0]}`);
+    
+    // For demo purposes - in a real app, this would interact with the smart contract
+    // We're simulating a successful withdrawal here
+    
+    // In a real app, we would have code like:
+    /*
+    const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
+    await contract.methods.withdrawDonation(campaignId).send({ from: accounts[0] });
+    */
+    
+    console.log(`Successfully withdrawn donation from campaign ${campaignId}`);
     return true;
   } catch (error) {
     console.error("Error withdrawing donation:", error);
@@ -74,6 +108,9 @@ declare global {
   interface Window {
     ethereum: {
       request: (params: { method: string; params?: any[] }) => Promise<any>;
+      on: (eventName: string, callback: (...args: any[]) => void) => void;
+      removeListener: (eventName: string, callback: (...args: any[]) => void) => void;
+      isMetaMask?: boolean;
     };
   }
 }
