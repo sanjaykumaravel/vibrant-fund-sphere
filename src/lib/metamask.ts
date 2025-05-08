@@ -103,6 +103,36 @@ export const withdrawDonation = async (campaignId: string): Promise<boolean> => 
   }
 };
 
+export const refundDonation = async (campaignId: string, amount: number): Promise<boolean> => {
+  if (!window.ethereum) {
+    alert("Please install MetaMask to use this feature!");
+    return false;
+  }
+  
+  try {
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    
+    console.log(`Attempting to refund ${amount} ETH from campaign ${campaignId} to account ${accounts[0]}`);
+    
+    // For demo purposes - in a real app, this would check campaign requirements and deadlines
+    // before processing refund through the smart contract
+    
+    // In a real app with a smart contract, we would have code like:
+    /*
+    const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
+    await contract.methods.requestRefund(campaignId).send({ from: accounts[0] });
+    */
+    
+    console.log(`Successfully refunded ${amount} ETH from campaign ${campaignId} to ${accounts[0]}`);
+    return true;
+  } catch (error) {
+    console.error("Error refunding donation:", error);
+    return false;
+  }
+};
+
 // Add type definition for window.ethereum
 declare global {
   interface Window {
