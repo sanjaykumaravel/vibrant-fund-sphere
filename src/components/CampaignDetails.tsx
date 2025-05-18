@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Edit, Trash2, Share, Plus, Calendar, Users, DollarSign, Wallet, RefreshCcw } from "lucide-react";
 import { connectWallet, donate, withdrawDonation, refundDonation } from "@/lib/metamask";
+import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 
 // Mock campaign data (in a real app this would come from an API or blockchain)
 const MOCK_CAMPAIGN = {
@@ -64,6 +66,7 @@ const CampaignDetails = () => {
   const [contribution, setContribution] = useState("0.1");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isRefundDialogOpen, setIsRefundDialogOpen] = useState(false);
+  const [animateProgress, setAnimateProgress] = useState(false);
   
   // Update campaign state to allow for updates to the UI
   const [campaign, setCampaign] = useState(MOCK_CAMPAIGN);
@@ -74,6 +77,11 @@ const CampaignDetails = () => {
   const handleConnectWallet = async () => {
     const address = await connectWallet();
     setWallet(address);
+  };
+  
+  const triggerProgressAnimation = () => {
+    setAnimateProgress(true);
+    setTimeout(() => setAnimateProgress(false), 1000);
   };
   
   const handleContribute = async () => {
@@ -96,6 +104,9 @@ const CampaignDetails = () => {
     const success = await donate(amount, campaign.id);
     if (success) {
       setIsDialogOpen(false);
+      
+      // Trigger animation
+      triggerProgressAnimation();
       
       // Update campaign state with new contribution
       setCampaign(prevCampaign => {
@@ -123,7 +134,7 @@ const CampaignDetails = () => {
       
       toast({
         title: "Contribution successful!",
-        description: `You have contributed ${amount} ETH to this campaign`,
+        description: `You have contributed ${amount} ETH to this campaign. The progress has been updated.`,
       });
       
     } else {
@@ -147,6 +158,9 @@ const CampaignDetails = () => {
       // Find user's contribution amount from the campaign
       const userContribution = campaign.contributions.find(c => c.address === wallet);
       const withdrawAmount = userContribution ? userContribution.amount : 0;
+      
+      // Trigger animation
+      triggerProgressAnimation();
       
       // Update campaign state
       if (withdrawAmount > 0) {
@@ -184,30 +198,40 @@ const CampaignDetails = () => {
       if (!address) return;
     }
     
-    // For demo purposes, we assume the user contributed 0.5 ETH
+    // Find user's contribution from the campaign
     const userContribution = campaign.contributions.find(c => c.address === wallet);
-    const refundAmount = userContribution ? userContribution.amount : 0.5;
+    const refundAmount = userContribution ? userContribution.amount : 0;
+    
+    if (refundAmount <= 0) {
+      toast({
+        title: "No contribution found",
+        description: "You don't have any contribution to refund",
+        variant: "destructive",
+      });
+      return;
+    }
     
     const success = await refundDonation(campaign.id, refundAmount);
     
     if (success) {
       setIsRefundDialogOpen(false);
       
+      // Trigger animation
+      triggerProgressAnimation();
+      
       // Update campaign state
-      if (refundAmount > 0) {
-        setCampaign(prevCampaign => {
-          const newContributions = prevCampaign.contributions.filter(c => c.address !== wallet);
-          const newRaisedAmount = Math.max(0, prevCampaign.raised - refundAmount);
-          const newBackersCount = prevCampaign.backers - 1;
-          
-          return {
-            ...prevCampaign,
-            raised: parseFloat(newRaisedAmount.toFixed(2)),
-            backers: Math.max(0, newBackersCount),
-            contributions: newContributions
-          };
-        });
-      }
+      setCampaign(prevCampaign => {
+        const newContributions = prevCampaign.contributions.filter(c => c.address !== wallet);
+        const newRaisedAmount = Math.max(0, prevCampaign.raised - refundAmount);
+        const newBackersCount = prevCampaign.backers - 1;
+        
+        return {
+          ...prevCampaign,
+          raised: parseFloat(newRaisedAmount.toFixed(2)),
+          backers: Math.max(0, newBackersCount),
+          contributions: newContributions
+        };
+      });
       
       toast({
         title: "Refund successful!",
@@ -343,6 +367,7 @@ const CampaignDetails = () => {
                   value={percentRaised} 
                   className="h-3 bg-violet-100 rounded-full" 
                   indicatorClassName="bg-gradient-to-r from-pink-500 via-violet-500 to-indigo-500"
+                  animate={animateProgress}
                 />
                 <div className="flex justify-end text-xs text-muted-foreground mt-1">
                   Goal: {campaign.goal} ETH
@@ -396,7 +421,7 @@ const CampaignDetails = () => {
                 </>
               ) : (
                 <>
-                  <div className="flex gap-2 w-full">
+                  <div className="flex gap-3 w-full">
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                       <DialogTrigger asChild>
                         <Button className="flex-1 bg-gradient-to-r from-pink-500 via-violet-600 to-indigo-600 hover:from-pink-600 hover:via-violet-700 hover:to-indigo-700 text-white border-0 flex items-center gap-2 shadow-md hover:shadow-lg transition-all">
@@ -436,33 +461,24 @@ const CampaignDetails = () => {
                       </DialogContent>
                     </Dialog>
                     
-                    <Dialog open={isRefundDialogOpen} onOpenChange={setIsRefundDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          className="flex-1 border-pink-300 text-pink-700 hover:bg-pink-50 flex items-center gap-2 shadow-sm"
-                        >
-                          <RefreshCcw className="h-4 w-4" />
-                          Refund
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="bg-gradient-to-br from-white to-pink-50 border-pink-100">
-                        <DialogHeader>
-                          <DialogTitle className="text-center text-xl bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-600">Request a Refund</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                          <p className="text-center text-muted-foreground">
-                            You can request a refund if the campaign hasn't reached its funding goal by the deadline. Once confirmed, your contribution will be returned to your wallet.
-                          </p>
-                          <Button 
-                            className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-0 shadow-md"
-                            onClick={handleRefund}
-                          >
-                            Confirm Refund Request
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                    <Button 
+                      variant="outline" 
+                      className="flex-1 border-pink-300 text-pink-700 hover:bg-pink-50 flex items-center gap-2 shadow-sm"
+                      onClick={() => {
+                        if (!wallet) {
+                          handleConnectWallet().then(() => {
+                            if (wallet) {
+                              handleRefund();
+                            }
+                          });
+                        } else {
+                          handleRefund();
+                        }
+                      }}
+                    >
+                      <RefreshCcw className="h-4 w-4" />
+                      Refund
+                    </Button>
                   </div>
                   
                   {hasContributed && (
@@ -511,8 +527,5 @@ const CampaignDetails = () => {
     </div>
   );
 };
-
-import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
 
 export default CampaignDetails;
