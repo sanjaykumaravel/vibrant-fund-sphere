@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -64,8 +65,8 @@ const CampaignDetails = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isRefundDialogOpen, setIsRefundDialogOpen] = useState(false);
   
-  // In a real app, we would fetch the campaign data using the ID
-  const campaign = MOCK_CAMPAIGN;
+  // Update campaign state to allow for updates to the UI
+  const [campaign, setCampaign] = useState(MOCK_CAMPAIGN);
   
   // Calculate percentage raised
   const percentRaised = Math.min(Math.round((campaign.raised / campaign.goal) * 100), 100);
@@ -95,12 +96,36 @@ const CampaignDetails = () => {
     const success = await donate(amount, campaign.id);
     if (success) {
       setIsDialogOpen(false);
+      
+      // Update campaign state with new contribution
+      setCampaign(prevCampaign => {
+        // Add new contribution
+        const newContribution = {
+          address: wallet || "Unknown",
+          amount: amount,
+          timestamp: new Date().toISOString()
+        };
+        
+        // Calculate new raised amount
+        const newRaisedAmount = prevCampaign.raised + amount;
+        
+        // Update backers count (only if this is a new backer)
+        const isNewBacker = !prevCampaign.contributions.some(c => c.address === wallet);
+        const newBackersCount = isNewBacker ? prevCampaign.backers + 1 : prevCampaign.backers;
+        
+        return {
+          ...prevCampaign,
+          raised: parseFloat(newRaisedAmount.toFixed(2)), // Round to 2 decimal places
+          backers: newBackersCount,
+          contributions: [newContribution, ...prevCampaign.contributions]
+        };
+      });
+      
       toast({
         title: "Contribution successful!",
         description: `You have contributed ${amount} ETH to this campaign`,
       });
       
-      // In a real app, we would refresh the campaign data
     } else {
       toast({
         title: "Contribution failed",
@@ -119,12 +144,30 @@ const CampaignDetails = () => {
     
     const success = await withdrawDonation(campaign.id);
     if (success) {
+      // Find user's contribution amount from the campaign
+      const userContribution = campaign.contributions.find(c => c.address === wallet);
+      const withdrawAmount = userContribution ? userContribution.amount : 0;
+      
+      // Update campaign state
+      if (withdrawAmount > 0) {
+        setCampaign(prevCampaign => {
+          const newContributions = prevCampaign.contributions.filter(c => c.address !== wallet);
+          const newRaisedAmount = Math.max(0, prevCampaign.raised - withdrawAmount);
+          const newBackersCount = prevCampaign.backers - 1;
+          
+          return {
+            ...prevCampaign,
+            raised: parseFloat(newRaisedAmount.toFixed(2)),
+            backers: Math.max(0, newBackersCount),
+            contributions: newContributions
+          };
+        });
+      }
+      
       toast({
         title: "Withdrawal successful!",
         description: "Your contribution has been returned to your wallet",
       });
-      
-      // In a real app, we would refresh the campaign data
     } else {
       toast({
         title: "Withdrawal failed",
@@ -142,17 +185,34 @@ const CampaignDetails = () => {
     }
     
     // For demo purposes, we assume the user contributed 0.5 ETH
-    const refundAmount = 0.5;
+    const userContribution = campaign.contributions.find(c => c.address === wallet);
+    const refundAmount = userContribution ? userContribution.amount : 0.5;
+    
     const success = await refundDonation(campaign.id, refundAmount);
     
     if (success) {
       setIsRefundDialogOpen(false);
+      
+      // Update campaign state
+      if (refundAmount > 0) {
+        setCampaign(prevCampaign => {
+          const newContributions = prevCampaign.contributions.filter(c => c.address !== wallet);
+          const newRaisedAmount = Math.max(0, prevCampaign.raised - refundAmount);
+          const newBackersCount = prevCampaign.backers - 1;
+          
+          return {
+            ...prevCampaign,
+            raised: parseFloat(newRaisedAmount.toFixed(2)),
+            backers: Math.max(0, newBackersCount),
+            contributions: newContributions
+          };
+        });
+      }
+      
       toast({
         title: "Refund successful!",
         description: `${refundAmount} ETH has been refunded to your wallet`,
       });
-      
-      // In a real app, we would refresh the campaign data
     } else {
       toast({
         title: "Refund failed",
@@ -246,7 +306,7 @@ const CampaignDetails = () => {
             </TabsContent>
             
             <TabsContent value="donaters" className="px-6 py-4">
-              <div className="space-y-4">
+              <div className="space-y-4 animate-fade-in">
                 {campaign.contributions.map((contribution, index) => (
                   <Card key={index} className="overflow-hidden border-l-4 border-l-violet-500 animate-fade-in hover:shadow-md transition-all">
                     <CardContent className="p-4 flex justify-between items-center">
