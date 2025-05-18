@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -200,7 +199,17 @@ const CampaignDetails = () => {
     
     // Find user's contribution from the campaign
     const userContribution = campaign.contributions.find(c => c.address === wallet);
-    const refundAmount = userContribution ? userContribution.amount : 0;
+    
+    if (!userContribution) {
+      toast({
+        title: "No contribution found",
+        description: "You don't have any contribution to refund",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const refundAmount = userContribution.amount;
     
     if (refundAmount <= 0) {
       toast({
@@ -210,6 +219,8 @@ const CampaignDetails = () => {
       });
       return;
     }
+    
+    console.log(`Attempting to refund ${refundAmount} ETH - exact user contribution amount`);
     
     const success = await refundDonation(campaign.id, refundAmount);
     

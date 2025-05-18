@@ -125,6 +125,8 @@ export const refundDonation = async (campaignId: string, amount: number): Promis
     await contract.methods.requestRefund(campaignId).send({ from: accounts[0] });
     */
     
+    // Here we would send the exact contributed amount back to the user's wallet
+    // For demo purpose we're assuming success
     console.log(`Successfully refunded ${amount} ETH from campaign ${campaignId} to ${accounts[0]}`);
     return true;
   } catch (error) {
